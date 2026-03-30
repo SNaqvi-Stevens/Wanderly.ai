@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wanderly — Project Checklist</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #17a08e;
+    --teal-dark: #0d6e60;
+    --teal-light: #e8f7f5;
+    --cream: #faf8f5;
+    --coral: #ff6b4a;
+    --amber: #f59e0b;
+    --green: #10b981;
+    --slate: #1e2d2d;
+    --muted: #6b7f7e;
+    --border: #e2ebe9;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--slate);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--slate);
+    padding: 28px 48px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: white;
+    letter-spacing: -0.5px;
+  }
+
+  header span {
+    color: var(--teal);
+    font-size: 22px;
+  }
+
+  header p {
+    color: #8fa8a6;
+    font-size: 13px;
+    font-weight: 300;
+    margin-top: 2px;
+  }
+
+  .header-text { flex: 1; }
+
+  .badge {
+    background: var(--teal);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 32px;
+  }
+
+  /* Summary bar */
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .summary-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 24px;
+    text-align: center;
+  }
+
+  .summary-card .number {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .summary-card .label {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .summary-card.done .number { color: var(--green); }
+  .summary-card.todo .number { color: var(--coral); }
+  .summary-card.strength .number { color: var(--teal); }
+  .summary-card.weakness .number { color: var(--amber); }
+
+  /* Section */
+  .section {
+    margin-bottom: 40px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .section-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .section-pill {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .pill-done { background: #d1fae5; color: #065f46; }
+  .pill-todo { background: #fee2e2; color: #991b1b; }
+  .pill-strength { background: #ccfbf1; color: #065f46; }
+  .pill-weakness { background: #fef3c7; color: #92400e; }
+  .pill-rubric { background: #ede9fe; color: #5b21b6; }
+
+  /* Items */
+  .items { display: flex; flex-direction: column; gap: 10px; }
+
+  .item {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    transition: box-shadow 0.2s;
+  }
+
+  .item:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+
+  .item-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .icon-done { background: #d1fae5; color: #065f46; }
+  .icon-todo { background: #fee2e2; color: #991b1b; }
+  .icon-strength { background: #ccfbf1; color: #0d9488; }
+  .icon-weakness { background: #fef3c7; color: #d97706; }
+  .icon-rubric { background: #ede9fe; color: #7c3aed; }
+
+  .item-content { flex: 1; }
+
+  .item-title {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--slate);
+  }
+
+  .item-note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+    line-height: 1.5;
+    font-weight: 300;
+  }
+
+  .item-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .tag-ml { background: #ede9fe; color: #6d28d9; }
+  .tag-frontend { background: #dbeafe; color: #1e40af; }
+  .tag-backend { background: #fce7f3; color: #9d174d; }
+  .tag-rubric { background: #f3e8ff; color: #7e22ce; }
+  .tag-accuracy { background: #fef3c7; color: #92400e; }
+  .tag-deploy { background: #ecfdf5; color: #065f46; }
+  .tag-ai { background: #ccfbf1; color: #0d9488; }
+
+  /* Two column layout for strengths/weaknesses */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .col-section { }
+
+  .col-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .col-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+  }
+
+  footer {
+    background: var(--slate);
+    color: #8fa8a6;
+    text-align: center;
+    padding: 20px;
+    font-size: 12px;
+    font-weight: 300;
+  }
+
+  footer strong { color: var(--teal); }
+
+  @media (max-width: 768px) {
+    .summary { grid-template-columns: repeat(2, 1fr); }
+    .two-col { grid-template-columns: 1fr; }
+    .container { padding: 24px 16px; }
+    header { padding: 20px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-text">
+    <h1><span>✦</span> Wanderly.ai — Project Checklist</h1>
+    <p>AAI 595 Applied Machine Learning · Group 13 · Saanie Naqvi · Due April 22, 2026</p>
+  </div>
+  <span class="badge">Midterm Progress</span>
+</header>
+
+<div class="container">
+
+  <!-- Summary -->
+  <div class="summary">
+    <div class="summary-card done">
+      <div class="number">28</div>
+      <div class="label">Completed</div>
+    </div>
+    <div class="summary-card todo">
+      <div class="number">12</div>
+      <div class="label">Still Needed</div>
+    </div>
+    <div class="summary-card strength">
+      <div class="number">10</div>
+      <div class="label">Strengths</div>
+    </div>
+    <div class="summary-card weakness">
+      <div class="number">8</div>
+      <div class="label">Weaknesses</div>
+    </div>
+  </div>
+
+  <!-- COMPLETED -->
+  <div class="section">
+    <div class="section-header">
+      <h2>✅ What's Been Built & Confirmed in Code</h2>
+      <span class="section-pill pill-done">Done</span>
+    </div>
+    <div class="items">
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">Base44 Entity Schema Design</div>
+          <div class="item-note">Three fully defined entities — Trip (heaviest, stores all AI content + booking data), UserPreferences, SavedItem. Auto-fields (id, created_date, updated_date) handled by Base44.</div>
+          <span class="item-tag tag-backend">Backend</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">50+ Destination Knowledge Base (destinations.js)</div>
+          <div class="item-note">Hand-curated data for 50+ destinations across all budget tiers. Each has: 12-month season scores, 12-month crowd data, per-hub flight estimates (JFK/LAX/ORD/IAH/MIA), 6 hotel tiers, 4 food tiers, dietary/family/visa flags, interests, vibes, similar_vibe_to. Also includes BUDGET_ALTERNATIVES, AIRPORT_CODES, and DEMO_PERSONAS exports.</div>
+          <span class="item-tag tag-ai">Knowledge Base</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">Rule-Based Scoring Engine (scoring.js)</div>
+          <div class="item-note">Scores destinations on 4 dimensions: Budget Fit (35%), Season (20%), Interest Match (25%), Feasibility (10%) + vibe bonus. Includes ±10pt random jitter for result diversity. rankDestinations(), rankByWeather(), rankByValue() all implemented.</div>
+          <span class="item-tag tag-ml">ML Layer</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">Full React Frontend (8 Pages)</div>
+          <div class="item-note">Landing, Onboarding, Results, TripDetail, MyTrips, Profile, BrowseAndBudget, SavedTrips + PageNotFound. React Router v6 with location.state for data passing between pages.</div>
+          <span class="item-tag tag-frontend">Frontend</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">5-Step Onboarding Wizard</div>
+          <div class="item-note">Framer Motion slide transitions, ChipSelect multi-select components, ICS calendar file parser (reads VEVENT blocks, extracts DTSTART/DTEND), saves to Base44 UserPreferences. Steps: Travelers → Interests → Budget → Logistics → Dates.</div>
+          <span class="item-tag tag-frontend">Frontend</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">Real .ics Calendar File Upload & Parser</div>
+          <div class="item-note">Parses actual calendar exports (Google Calendar, Apple Calendar, Outlook). Extracts blocked date ranges and saves as available_dates on UserPreferences. Supports save/upload/skip modes.</div>
+          <span class="item-tag tag-frontend">Frontend</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">Base44 Auth (Login/Logout/Session Management)</div>
+          <div class="item-note">Full auth lifecycle: redirectToLogin(), auth.me() on load, token management via localStorage, graceful error states for unregistered users and expired tokens.</div>
+          <span class="item-tag tag-backend">Backend</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">LLM Integration — GPT-4o-mini via Base44 InvokeLLM()</div>
+          <div class="item-note">JSON schema-constrained output enforced on every call — no freeform text, no parsing failures. All 10 TripDetail tabs use structured schemas. Budget mode triggers automatically under $500/person, changing prompt strategy to prioritize hostels/street food/free activities.</div>
+          <span class="item-tag tag-ai">AI</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">10-Tab TripDetail Page</div>
+          <div class="item-note">Overview, Flights, Stay, Food, Activities, Transport, Budget, Itinerary, Money/Currency, Packing. Each tab lazy-loads on click using fetchTab(). Loading progress bar with step messages. Tabs are isolated components.</div>
+          <span class="item-tag tag-frontend">Frontend</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">Dietary-Aware Food Recommendations</div>
+          <div class="item-note">Dietary restrictions detected from UserPreferences (vegetarian, vegan, gluten-free, religious restrictions, etc.). AI prompt modified with CRITICAL instruction to only return compliant restaurants. destinations.js includes dietary-friendliness ratings per destination.</div>
+          <span class="item-tag tag-ai">AI</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">3 AI Chat Assistants</div>
+          <div class="item-note">TripChatAssistant (per trip, can modify tab data), ResultsChatAssistant (helps refine results), ProfileChatAssistant (helps update preferences). GlobalChat available site-wide.</div>
+          <span class="item-tag tag-ai">AI</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">BrowseAndBudget — Any Destination in the World</div>
+          <div class="item-note">Hybrid system: known destinations use scoreDestination() + AI content. Unknown destinations use InvokeLLM() to generate ALL data including daily costs, season analysis, visa info, dietary friendliness ratings. Also calls GenerateImage() to AI-generate a hero photo for destinations not in the database.</div>
+          <span class="item-tag tag-ai">AI</span> <span class="item-tag tag-ml">ML Layer</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">AI-Generated Hero Images for Unknown Destinations</div>
+          <div class="item-note">base44.integrations.Core.GenerateImage() called for any destination not in destinations.js. Prompt engineered for professional travel photography aesthetic.</div>
+          <span class="item-tag tag-ai">AI</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">15 Booking Deep-Link APIs</div>
+          <div class="item-note">Google Flights, Kayak, Booking.com, Airbnb, Hostelworld, Hotels.com, GetYourGuide, Viator, Google Maps, Wise, XE, Revolut, Uber, World Nomads, KiwiTaxi. Pre-searched URLs built from trip data.</div>
+          <span class="item-tag tag-frontend">Frontend</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">MyTrips — Trip Status Tracking</div>
+          <div class="item-note">Filter by favorited, planning, booked, completed status. Update planning_status and is_favorited directly via base44.entities.Trip.update().</div>
+          <span class="item-tag tag-frontend">Frontend</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">Budget Tracker with Real Expense Logging</div>
+          <div class="item-note">Log actual spending by category, persisted to Trip.spending array in Base44. Running total vs. budget cap displayed. Lives in TripFolderTab.</div>
+          <span class="item-tag tag-frontend">Frontend</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">PDF Trip Export (generateTripPDF.js)</div>
+          <div class="item-note">Full branded PDF export using jsPDF. Custom page headers, teal color scheme, multi-page support with page breaks. Accessible from TripFolderTab.</div>
+          <span class="item-tag tag-frontend">Frontend</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">Document Folder — File Upload & Storage</div>
+          <div class="item-note">Upload and store travel documents (passport, visa, confirmations) as base64 in Trip.documents array. Stored in Base44 database per trip.</div>
+          <span class="item-tag tag-frontend">Frontend</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">Pre-Departure Checklist</div>
+          <div class="item-note">12-item checklist (passport, insurance, currency, bank notification, phone plan, etc.) persisted to Base44 Trip entity. Booking confirmations tracking for 7 booking categories.</div>
+          <span class="item-tag tag-frontend">Frontend</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">Score Badges with Explanations</div>
+          <div class="item-note">Visual score badges for Season, Budget Fit, Match, Feasibility, and Overall displayed on TripCards and TripDetail. Not a black box — scores are explained to users.</div>
+          <span class="item-tag tag-ml">ML Layer</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">3-Tier Cost Display (Budget / Comfortable / Splurge)</div>
+          <div class="item-note">All cost estimates shown at three tiers based on accommodation and food tier selections from destinations.js. Per-person and total breakdowns shown.</div>
+          <span class="item-tag tag-frontend">Frontend</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">Design System (Tailwind + CSS Tokens)</div>
+          <div class="item-note">Full token system: --primary teal, --accent deep teal, --background warm cream, --destructive coral. Playfair Display + DM Sans font pairing. All components use semantic classes, never raw hex values.</div>
+          <span class="item-tag tag-frontend">Frontend</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">TanStack Query for Data Fetching</div>
+          <div class="item-note">Caching, background refetching, and query invalidation handled by TanStack Query. refetchOnWindowFocus disabled.</div>
+          <span class="item-tag tag-frontend">Frontend</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">Fixed Home Button on All Pages</div>
+          <div class="item-note">Fixed bottom-right ✦ Home pill button on all inner pages (Onboarding, Results, TripDetail, MyTrips, BrowseAndBudget, Profile). Confirmed functional.</div>
+          <span class="item-tag tag-frontend">Frontend</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">TripDetail Refresh Bug — Mostly Resolved</div>
+          <div class="item-note">hasGeneratedRef prevents double execution. Falls back to Base44 DB fetch then destination fallback if no state. Some minor edge cases may remain.</div>
+          <span class="item-tag tag-frontend">Frontend</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">Airport Personalization Fixed</div>
+          <div class="item-note">home_airport correctly pulled from UserPreferences with IAH as fallback (not hardcoded). Per-hub flight estimates in destinations.js for 5 major US hubs.</div>
+          <span class="item-tag tag-frontend">Frontend</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">App is Live & Deployed via Base44</div>
+          <div class="item-note">Frontend deployed via Base44 platform. Accessible via shareable URL. Meets rubric requirement for live hosted version.</div>
+          <span class="item-tag tag-deploy">Deploy</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-done">✓</div>
+        <div class="item-content">
+          <div class="item-title">Results Sort Tabs (Overall / Weather / Value)</div>
+          <div class="item-note">Three sort modes using useMemo — no re-fetching, instant re-sort of in-memory array. rankByWeather() and rankByValue() implemented in scoring.js.</div>
+          <span class="item-tag tag-ml">ML Layer</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- STILL NEEDED -->
+  <div class="section">
+    <div class="section-header">
+      <h2>🔲 What Still Needs to Be Done</h2>
+      <span class="section-pill pill-todo">To Do</span>
+    </div>
+    <div class="items">
+
+      <div class="item">
+        <div class="item-icon icon-todo">!</div>
+        <div class="item-content">
+          <div class="item-title">Build & Deploy Flask/scikit-learn ML Backend</div>
+          <div class="item-note">Python backend exists conceptually but is not in the codebase and not deployed. Needs to be built, trained on synthetic destination data, deployed to Render/Railway (free), and connected to Results.jsx via fetch() with scoring.js as fallback.</div>
+          <span class="item-tag tag-ml">ML — Priority 1</span> <span class="item-tag tag-deploy">Deploy</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-todo">!</div>
+        <div class="item-content">
+          <div class="item-title">ML Accuracy Evaluation — MAE, RMSE, Feature Importance</div>
+          <div class="item-note">Required by rubric for technical execution. Run MAE/RMSE on scikit-learn ranking model against held-out test set. Generate feature importance plot showing which factors (budget_fit, season, match, feasibility) the model weighted most. Include results in final presentation.</div>
+          <span class="item-tag tag-accuracy">Rubric Required</span> <span class="item-tag tag-ml">ML</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-todo">!</div>
+        <div class="item-content">
+          <div class="item-title">Export Base44 Database Data</div>
+          <div class="item-note">Export Trip, UserPreferences, SavedItem records before credits fully run out. Use as training data for ML model (is_favorited and planning_status = positive labels). Critical to do soon.</div>
+          <span class="item-tag tag-backend">Urgent</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-todo">!</div>
+        <div class="item-content">
+          <div class="item-title">Public GitHub Repository with Complete README</div>
+          <div class="item-note">Rubric explicitly requires: source code, README.md with setup instructions + dependencies + AI tools usage guide, requirements.txt or equivalent for dependencies. Currently README is Base44 boilerplate only.</div>
+          <span class="item-tag tag-rubric">Rubric Required</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-todo">!</div>
+        <div class="item-content">
+          <div class="item-title">Problem Statement Document (1–2 pages)</div>
+          <div class="item-note">Rubric requires: clearly define the problem, motivate with evidence, justify AI importance and societal impact. This exists in the proposal deck but needs to be written as a standalone document.</div>
+          <span class="item-tag tag-rubric">Rubric Required</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-todo">!</div>
+        <div class="item-content">
+          <div class="item-title">Project Description Document (5–10 pages)</div>
+          <div class="item-note">Rubric requires: solution approach, AI model details, development tools usage, expected impact. Needs to cover the two-layer AI architecture (scikit-learn + GPT-4o-mini), Base44 trade-offs, and the hybrid BrowseAndBudget system.</div>
+          <span class="item-tag tag-rubric">Rubric Required</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-todo">!</div>
+        <div class="item-content">
+          <div class="item-title">Architecture Diagram</div>
+          <div class="item-note">Rubric explicitly requires a flowchart or architecture diagram. Should show: User → Onboarding → UserPreferences (Base44) → scoring.js / Flask ML → Trip records (Base44) → TripDetail → InvokeLLM (GPT-4o-mini) → 10 tabs → Booking APIs.</div>
+          <span class="item-tag tag-rubric">Rubric Required</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-todo">!</div>
+        <div class="item-content">
+          <div class="item-title">2–5 Minute Demo Video</div>
+          <div class="item-note">Rubric requires a video walkthrough showing the app in action, key AI features, and user flow. Should cover: onboarding → results (show scoring) → TripDetail tabs → BrowseAndBudget with unknown destination → chat assistant.</div>
+          <span class="item-tag tag-rubric">Rubric Required</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-todo">!</div>
+        <div class="item-content">
+          <div class="item-title">LLM Content Accuracy Spot-Check</div>
+          <div class="item-note">Manually verify flight prices, hotel names, restaurant names, and safety scores for 3–5 destinations against real sources. Document findings. Disclose limitations in final submission. Cannot be fully verified until Base44 credits are replenished or ML backend is live.</div>
+          <span class="item-tag tag-accuracy">Accuracy</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-todo">!</div>
+        <div class="item-content">
+          <div class="item-title">Reconcile Scoring Weight Discrepancy</div>
+          <div class="item-note">Proposal says Budget 30% / Season 25% / Match 25% / Feasibility 20%. Code has Budget 35% / Season 20% / Match 25% / Feasibility 10%. Document the actual weights used and explain why they changed — or update proposal to match.</div>
+          <span class="item-tag tag-ml">ML</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-todo">!</div>
+        <div class="item-content">
+          <div class="item-title">Database Migration Plan (Post-Base44)</div>
+          <div class="item-note">With Base44 credits running out, need a plan to migrate to Supabase or Firebase for the final submission. Auth + database + entity calls all need to be rewritten. Can reuse exported data.</div>
+          <span class="item-tag tag-backend">Backend</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-icon icon-todo">!</div>
+        <div class="item-content">
+          <div class="item-title">Challenges & Solutions Documentation</div>
+          <div class="item-note">Rubric requires: document challenges and how AI tools helped overcome them. Cover: Base44 credit limits, LLM hallucination handling, building solo, TripDetail refresh bug, airport hardcoding fix, and the ML backend connection gap.</div>
+          <span class="item-tag tag-rubric">Rubric Required</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- STRENGTHS & WEAKNESSES -->
+  <div class="two-col">
+
+    <div class="col-section">
+      <div class="col-header">
+        <h3>💪 Strengths</h3>
+        <span class="section-pill pill-strength">Technical</span>
+      </div>
+      <div class="items">
+
+        <div class="item">
+          <div class="item-icon icon-strength">↑</div>
+          <div class="item-content">
+            <div class="item-title">Two-Layer AI Architecture</div>
+            <div class="item-note">scikit-learn for ranking + GPT-4o-mini for content generation. Separates deterministic logic from creative generation — a genuinely sophisticated design.</div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon icon-strength">↑</div>
+          <div class="item-content">
+            <div class="item-title">JSON Schema-Constrained LLM Output</div>
+            <div class="item-note">Most students prompt for free text and parse messily. Enforcing typed schemas means zero parsing failures and reliable structured data from every AI call.</div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon icon-strength">↑</div>
+          <div class="item-content">
+            <div class="item-title">Hand-Curated Knowledge Base</div>
+            <div class="item-note">50+ destinations with 6 hotel tiers, 4 food tiers, per-hub flight estimates, dietary/family/visa flags, crowd data. Substantial domain expertise encoded as structured data.</div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon icon-strength">↑</div>
+          <div class="item-content">
+            <div class="item-title">Unlimited Destination Coverage</div>
+            <div class="item-note">BrowseAndBudget handles any destination in the world via AI fallback, including AI-generated hero images. Not limited to the 50-destination static list.</div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon icon-strength">↑</div>
+          <div class="item-content">
+            <div class="item-title">Real .ics Calendar Integration</div>
+            <div class="item-note">Actual calendar file parsing — not a workaround. Reads VEVENT blocks from Google Calendar/Outlook exports. Differentiates Wanderly from any competitor.</div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon icon-strength">↑</div>
+          <div class="item-content">
+            <div class="item-title">Production-Grade Feature Set</div>
+            <div class="item-note">10 AI tabs, 3 chat assistants, budget tracker, PDF export, document folder, booking checklists, 15 booking APIs — far beyond a typical student project MVP.</div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon icon-strength">↑</div>
+          <div class="item-content">
+            <div class="item-title">Transparent Scoring (Not a Black Box)</div>
+            <div class="item-note">Score badges with labels are shown to users with explanations. Addresses AI interpretability — a key concern in the rubric's societal impact criteria.</div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon icon-strength">↑</div>
+          <div class="item-content">
+            <div class="item-title">Budget Mode Intelligence</div>
+            <div class="item-note">App detects budget tier and changes the entire AI prompt strategy — not just numbers. Under $500/person switches to hostels, street food, free activities automatically.</div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon icon-strength">↑</div>
+          <div class="item-content">
+            <div class="item-title">Dietary Awareness</div>
+            <div class="item-note">Dietary constraints (vegetarian, vegan, gluten-free, religious restrictions, allergies) flow from onboarding all the way through to AI prompts with CRITICAL-level enforcement. Addresses a real inclusivity need — travelers with dietary restrictions are underserved by existing tools.</div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon icon-strength">↑</div>
+          <div class="item-content">
+            <div class="item-title">Built Solo Under Difficult Circumstances</div>
+            <div class="item-note">Completed largely alone despite a 3-person team, while recovering from surgery, on a compressed timeline. Volume and quality of work is exceptional given constraints.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="col-section">
+      <div class="col-header">
+        <h3>⚠️ Weaknesses & Limitations</h3>
+        <span class="section-pill pill-weakness">Honest Assessment</span>
+      </div>
+      <div class="items">
+
+        <div class="item">
+          <div class="item-icon icon-weakness">↓</div>
+          <div class="item-content">
+            <div class="item-title">ML Backend Not Connected</div>
+            <div class="item-note">The Flask/scikit-learn backend exists separately but is not wired into the frontend. App currently runs on rule-based JS scoring in production, not a trained ML model.</div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon icon-weakness">↓</div>
+          <div class="item-content">
+            <div class="item-title">No Accuracy Evaluation Yet (MAE/RMSE)</div>
+            <div class="item-note">Rubric requires ML evaluation metrics. No MAE, RMSE, or feature importance analysis has been run yet. Critical gap for final submission.</div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon icon-weakness">↓</div>
+          <div class="item-content">
+            <div class="item-title">LLM Content Accuracy Unverified</div>
+            <div class="item-note">Flight prices, hotel names, restaurant names, safety scores, and currency rates are GPT-4o-mini estimates — not live data. Hallucination risk. No spot-checking done post-surgery.</div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon icon-weakness">↓</div>
+          <div class="item-content">
+            <div class="item-title">±10pt Random Jitter in Rankings</div>
+            <div class="item-note">Non-deterministic results — same preferences can return different destinations on refresh. Intentional for diversity but undermines reproducibility. Should be replaced by ML-learned diversity.</div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon icon-weakness">↓</div>
+          <div class="item-content">
+            <div class="item-title">Hand-Tuned Scoring Weights</div>
+            <div class="item-note">Budget 35% / Season 20% / Match 25% / Feasibility 10% were manually set — not learned from data. This is exactly what the scikit-learn model should replace.</div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon icon-weakness">↓</div>
+          <div class="item-content">
+            <div class="item-title">Base44 Vendor Lock-In & Credit Limits</div>
+            <div class="item-note">Auth, database, and AI calls all tightly coupled to Base44 SDK. Credits ran out during development, affecting testing. Migration would require rewriting all three layers.</div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon icon-weakness">↓</div>
+          <div class="item-content">
+            <div class="item-title">No Live Flight/Hotel Price APIs</div>
+            <div class="item-note">Booking links use deep links to external sites — Wanderly doesn't fetch actual live prices. Users see AI-estimated costs, not real-time data. Needs disclosure.</div>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="item-icon icon-weakness">↓</div>
+          <div class="item-content">
+            <div class="item-title">Unknown Destination Scores Default to 75</div>
+            <div class="item-note">When BrowseAndBudget generates a trip for a destination not in destinations.js, all scores default to 75 — a flat neutral baseline rather than a calculated score. ML backend would fix this.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>Wanderly.ai · AAI 595 Applied Machine Learning · Stevens Institute of Technology · <strong>Due April 22, 2026</strong></p>
+</footer>
+
+</body>
+</html>
